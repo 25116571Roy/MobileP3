@@ -14,6 +14,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  final _nomorTeleponController =  TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -23,6 +25,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+
+    _nomorTeleponController.dispose();
     super.dispose();
   }
 
@@ -45,6 +49,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     if (!emailRegex.hasMatch(value.trim())) {
       return 'Format email tidak valid';
+    }
+    return null;
+  }
+
+  // Validasi nomor telepon
+  String? _validateNomorTelepon(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Nomor telepon tidak boleh kosong';
+    }
+    final phoneRegex = RegExp(r'^[0-9]+$');
+    if (!phoneRegex.hasMatch(value.trim())) {
+      return 'Format nomor telepon tidak valid';
+    }
+    if(value.trim().length < 10 || value.trim().length > 13) {
+      return 'Nomor telepon harus antara 10 hingga 13 digit';
     }
     return null;
   }
@@ -95,7 +114,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             title: const Text('Registrasi Berhasil'),
             content: Text(
               'Selamat, ${_nameController.text}!\n'
-              'Email: ${_emailController.text}',
+              'Email: ${_emailController.text}\n'
+              'Nomor Telepon: ${_nomorTeleponController.text}',
             ),
             actions: [
               TextButton(
@@ -119,6 +139,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _emailController.clear();
     _passwordController.clear();
     _confirmPasswordController.clear();
+
+    _nomorTeleponController.clear();
   }
 
   @override
@@ -173,6 +195,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                   validator: _validateEmail,
+                ),
+                CustomTextField(
+                  controller: _nomorTeleponController,
+                  label: 'Nomor Telepon',
+                  hint: 'Masukkan nomor telepon Anda',
+                  prefixIcon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                  validator: _validateNomorTelepon,
                 ),
                 // Field Password
                 Padding(
