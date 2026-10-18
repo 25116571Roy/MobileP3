@@ -30,10 +30,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() {
         _selectedDate = picked;
         _tanggalLahirController.text =
-            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+            "${picked.year}-${picked.month.toString().padLeft
+            (2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
+
+  String? _selectedGender;
+  final List<String> _genderOptions = ['Laki-laki', 'Perempuan'];
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -136,7 +141,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               'Selamat, ${_nameController.text}!\n'
               'Email: ${_emailController.text}\n'
               'Nomor Telepon: ${_nomorTeleponController.text}\n'
-              'Tanggal Lahir: ${_tanggalLahirController.text}',
+              'Tanggal Lahir: ${_tanggalLahirController.text}\n'
+              'Jenis Kelamin: ${_selectedGender}',
             ),
             actions: [
               TextButton(
@@ -166,6 +172,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _tanggalLahirController.clear();
     setState(() {
       _selectedDate = null;
+      _selectedGender = null;
     });
   }
 
@@ -222,6 +229,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   keyboardType: TextInputType.emailAddress,
                   validator: _validateEmail,
                 ),
+
                 CustomTextField(
                   controller: _nomorTeleponController,
                   label: 'Nomor Telepon',
@@ -248,6 +256,38 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Tanggal lahir tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                // Field Jenis Kelamin
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedGender,
+                    decoration: InputDecoration(
+                      labelText: 'Jenis Kelamin',
+                      hintText: 'Pilih jenis kelamin Anda',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    items: _genderOptions.map((String gender) {
+                      return DropdownMenuItem<String>(
+                        value: gender,
+                        child: Text(gender),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedGender = newValue;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis kelamin tidak boleh kosong';
                       }
                       return null;
                     },
