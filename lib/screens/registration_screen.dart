@@ -16,6 +16,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _confirmPasswordController = TextEditingController();
 
   final _nomorTeleponController =  TextEditingController();
+
+  final _tanggalLahirController =  TextEditingController();
+  DateTime? _selectedDate;
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _tanggalLahirController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -27,6 +45,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _confirmPasswordController.dispose();
 
     _nomorTeleponController.dispose();
+
+    _tanggalLahirController.dispose();
     super.dispose();
   }
 
@@ -115,7 +135,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             content: Text(
               'Selamat, ${_nameController.text}!\n'
               'Email: ${_emailController.text}\n'
-              'Nomor Telepon: ${_nomorTeleponController.text}',
+              'Nomor Telepon: ${_nomorTeleponController.text}\n'
+              'Tanggal Lahir: ${_tanggalLahirController.text}',
             ),
             actions: [
               TextButton(
@@ -141,6 +162,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _confirmPasswordController.clear();
 
     _nomorTeleponController.clear();
+
+    _tanggalLahirController.clear();
+    setState(() {
+      _selectedDate = null;
+    });
   }
 
   @override
@@ -204,6 +230,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   keyboardType: TextInputType.phone,
                   validator: _validateNomorTelepon,
                 ),
+
+                //Field Tanggal Lahir
+                Padding(padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: TextFormField(
+                    controller: _tanggalLahirController,
+                    decoration: InputDecoration(
+                      labelText: 'Tanggal Lahir',
+                      hintText: 'Pilih tanggal lahir Anda',
+                      prefixIcon: const Icon(Icons.calendar_today),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    readOnly: true,
+                    onTap: () => _selectDate(context),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Tanggal lahir tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+
                 // Field Password
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
