@@ -39,6 +39,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String? _selectedGender;
   final List<String> _genderOptions = ['Laki-laki', 'Perempuan'];
 
+  bool _setujuSyarat = false;
+  bool _showTermsError = false;
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -123,6 +126,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   // Handler submit form
   void _submitForm() {
+    final isFormValid = _formKey.currentState!.validate();
+    if (!_setujuSyarat) {
+      setState(() {
+        _showTermsError = true;
+      });
+    } 
+    else {
+      setState(() {
+        _showTermsError = false;
+      });
+    }
+    if(!isFormValid || !_setujuSyarat) {
+      return;
+    }
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -173,6 +190,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _selectedDate = null;
       _selectedGender = null;
+      _setujuSyarat = false;
+      _showTermsError = false;
     });
   }
 
@@ -323,6 +342,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     validator: _validatePassword,
                   ),
                 ),
+                
+                // Checkbox Syarat dan Ketentuan
+                Column(crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CheckboxListTile(
+                    value: _setujuSyarat,
+                    onChanged: (value){
+                      setState(() {
+                        _setujuSyarat = value ?? false;
+                        _showTermsError = !_setujuSyarat;
+                      });
+                    },
+                    title: const Text('Saya setuju dengan syarat dan ketentuan'),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  if(_showTermsError)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        'Anda harus menyetujui syarat dan ketentuan',
+                        style: TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ),
+                ]),
                 // Field Konfirmasi Password
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
