@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../widgets/custom_text_field.dart';
 
+
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
   @override
@@ -41,6 +43,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   bool _setujuSyarat = false;
   bool _showTermsError = false;
+
+  String _strengthLabel = '';
+  double _strengthValue = 0;
+  Color _strengthColor = Colors.grey;
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -123,6 +129,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
     return null;
   }
+  void _checkPasswordStrength(String value) {
+  final hasUpper = value.contains(RegExp(r'[A-Z]'));
+  final hasLower = value.contains(RegExp(r'[a-z]'));
+  final hasDigit = value.contains(RegExp(r'[0-9]'));
+  final hasSymbol = value.contains(RegExp(r'[^A-Za-z0-9]'));
+
+  String label;
+  double progress;
+  Color color;
+
+  if (value.isEmpty) {
+    label = '';
+    progress = 0;
+    color = Colors.grey;
+  } else if (value.length >= 8 && hasUpper && hasLower && hasDigit && hasSymbol) {
+    label = 'Kuat';
+    progress = 1.0;
+    color = Colors.green;
+  } else if (value.length >= 8 && (hasUpper || hasLower) && hasDigit) {
+    label = 'Sedang';
+    progress = 0.66;
+    color = Colors.orange;
+  } else {
+    label = 'Lemah';
+    progress = 0.33;
+    color = Colors.red;
+  }
+
+  setState(() {
+    _strengthLabel = label;
+    _strengthValue = progress;
+    _strengthColor = color;
+  });
+}
 
   // Handler submit form
   void _submitForm() {
@@ -189,9 +229,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _tanggalLahirController.clear();
     setState(() {
       _selectedDate = null;
+
       _selectedGender = null;
+
       _setujuSyarat = false;
       _showTermsError = false;
+
+      _strengthLabel = '';
+      _strengthValue = 0;
+      _strengthColor = Colors.grey;
     });
   }
 
@@ -318,6 +364,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: TextFormField(
                     controller: _passwordController,
+                    onChanged: _checkPasswordStrength,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Minimal 8 karakter, huruf kapital, angka',
@@ -342,6 +389,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     validator: _validatePassword,
                   ),
                 ),
+                // Indikator Kekuatan Password
+                if (_strengthLabel.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LinearProgressIndicator(
+                          value: _strengthValue,
+                          color: _strengthColor,
+                          backgroundColor: Colors.grey[300],
+                          minHeight: 5,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kekuatan Password: $_strengthLabel',
+                          style: TextStyle(color: _strengthColor, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
                 
                 // Checkbox Syarat dan Ketentuan
                 Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,3 +502,4 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 }
+
